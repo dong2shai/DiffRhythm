@@ -119,9 +119,9 @@ class DiT(nn.Module):
 
         self.dim = dim
         self.depth = depth
-
         llama_config = LlamaConfig(hidden_size=dim, intermediate_size=dim * ff_mult, hidden_act='silu', max_position_embeddings=max_pos)
         llama_config._attn_implementation = 'sdpa'
+        print("++++++++++++++++++++++++++++++++++++ 100 ", llama_config.hidden_size, llama_config.num_attention_heads)
 
         self.transformer_blocks = nn.ModuleList(
             [LlamaDecoderLayer(llama_config, layer_idx=i) for i in range(depth)]

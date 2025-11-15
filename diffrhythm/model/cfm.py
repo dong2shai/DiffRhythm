@@ -201,10 +201,12 @@ class CFM(nn.Module):
 
         def fn(t, x):
             x = torch.cat([x, x], 0)
+            #x = x.to(torch.float64)
             pred = self.transformer(
                 x=x, text_embed=text_embed, text_residuals=text_residuals, cond=step_cond, time=t, 
                 drop_audio_cond=True, drop_prompt=False, style_prompt=style_prompt, start_time=start_time_embed
             )
+            print("+++++++++++++++++++++++++++++++++++4 ", pred.dtype)
 
             positive_pred, negative_pred = pred.chunk(2, 0)
             cfg_pred = positive_pred + (positive_pred - negative_pred) * cfg_strength
@@ -233,8 +235,8 @@ class CFM(nn.Module):
         if sway_sampling_coef is not None:
             t = t + sway_sampling_coef * (torch.cos(torch.pi / 2 * t) - 1 + t)
 
+        print("++++++++++++++++++++++++++++++++++++++ ", y0.dtype, t.dtype)
         trajectory = odeint(fn, y0, t, **self.odeint_kwargs)
-
         sampled = trajectory[-1]
         out = sampled
         out = torch.where(fixed_span_mask, out, cond)
